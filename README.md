@@ -35,18 +35,42 @@ Install-Module -Name Send-MailKitMessage -Scope CurrentUser
 1. Clone the repository:
 
 ```powershell
-git clone https://github.com/jarbas-abreujr/powershell-system-monitor.git
-cd powershell-system-monitor
+git clone https://github.com/jarbas-abreujr/powershell-system-monitor.git C:\MonitorApp
+cd C:\MonitorApp
 ```
 
-2. Create the configuration folder and copy the example file:
+2. Copy the example configuration file:
 
 ```powershell
-New-Item -ItemType Directory -Path C:\MonitorApp\settings -Force
-Copy-Item .\config.example.json C:\MonitorApp\settings\config.json
+Copy-Item .\config.example.json .\config.json
 ```
 
-3. Edit `C:\MonitorApp\settings\config.json`: adjust the thresholds, then set `Enabled` to `true` and fill in the details of each channel you want to use.
+3. Edit `C:\MonitorApp\config.json`: adjust the thresholds, then set `Enabled` to `true` and fill in the details of each channel you want to use.
+
+4. Run the script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Monitor.ps1
+```
+
+The log is written to `C:\MonitorApp\Logs\CPULogs.txt`, and the folder is created automatically. Both the log and config paths are defined at the top of the script.
+
+## Setup
+
+1. Clone the repository:
+
+```powershell
+git clone https://github.com/jarbas-abreujr/powershell-system-monitor.git C:\MonitorApp
+cd C:\MonitorApp
+```
+
+2. Copy the example configuration file:
+
+```powershell
+Copy-Item .\config.example.json .\config.json
+```
+
+3. Edit `C:\MonitorApp\config.json`: adjust the thresholds, then set `Enabled` to `true` and fill in the details of each channel you want to use.
 
 4. Run the script:
 
