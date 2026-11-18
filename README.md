@@ -98,11 +98,12 @@ Log:
 
 Alerts received by email and on Discord:
 
-![Email alerts](images/emailalerts.png)
+![Email alerts](images/EmailAlerts.png)
 
-![Discord alerts](images/discordalerts.png)
+![Discord alerts](images/DiscordAlerts.png)
 
 Log File output
+
 ![Log File](images/LogsFile.png)
 
 ## Limitations and next steps
