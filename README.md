@@ -102,7 +102,7 @@ Alerts received by email and on Discord:
 
 ![Discord alerts](images/DiscordAlerts.png)
 
-Log File output
+Log File output:
 
 ![Log File](images/LogsFile.png)
 
