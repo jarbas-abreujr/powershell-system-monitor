@@ -55,31 +55,6 @@ powershell -ExecutionPolicy Bypass -File .\Monitor.ps1
 
 The log is written to `C:\MonitorApp\Logs\CPULogs.txt`, and the folder is created automatically. Both the log and config paths are defined at the top of the script.
 
-## Setup
-
-1. Clone the repository:
-
-```powershell
-git clone https://github.com/jarbas-abreujr/powershell-system-monitor.git C:\MonitorApp
-cd C:\MonitorApp
-```
-
-2. Copy the example configuration file:
-
-```powershell
-Copy-Item .\config.example.json .\config.json
-```
-
-3. Edit `C:\MonitorApp\config.json`: adjust the thresholds, then set `Enabled` to `true` and fill in the details of each channel you want to use.
-
-4. Run the script:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\Monitor.ps1
-```
-
-The log is written to `C:\MonitorApp\Logs\CPULogs.txt`, and the folder is created automatically. Both the log and config paths are defined at the top of the script.
-
 ## Configuration
 
 | Field | Description |
