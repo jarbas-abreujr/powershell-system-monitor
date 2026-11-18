@@ -1,33 +1,113 @@
 # PowerShell System Monitor
 
-A Windows PowerShell script that continuously monitors CPU, memory, and disk usage. Thresholds and notification channels are configured in a local JSON file.
+A PowerShell script that monitors CPU, memory and disk usage on a Windows machine and sends alerts to Email, Slack, Discord and Microsoft Teams when usage crosses configurable thresholds.
+
+## Features
+
+- Monitors CPU, memory and disk usage through CIM (`Get-CimInstance`)
+- Two severity levels per metric (Warning and Critical), defined in `config.json`
+- Sends an alert only when a metric changes level, including when it returns to Normal, so a sustained high value does not generate repeated notifications
+- Each notification channel can be enabled or disabled independently
+- A failure collecting one metric, or sending to one channel, does not stop the others; errors are written to the log file
+- Console output on every check and a persistent log file
+
+## How it works
+
+Every `CheckInterval` seconds the script reads CPU, memory and disk usage and converts each value into a level (Normal, Warning or Critical) using the configured thresholds. It then compares that level with the last known level of the same metric. If the level changed, `Send-Alert` writes the event to the log and sends the message to every enabled channel.
+
+Alert message format:
+
+```
+[Warning] Disk usage is at 80.48%.
+```
 
 ## Requirements
 
-- Windows PowerShell 5.1 or later
-- The `Send-MailKitMessage` PowerShell module only if email alerts are enabled
+- Windows with Windows PowerShell 5.1 (tested on 5.1.26100)
+- The `Send-MailKitMessage` module, only if the Email channel is enabled:
+
+```powershell
+Install-Module -Name Send-MailKitMessage -Scope CurrentUser
+```
 
 ## Setup
 
-1. Copy `config.example.json` to `config.json`.
-2. Set `DiskPath` to a drive on the machine, such as `C:\`.
-3. Adjust the warning and critical thresholds as needed.
-4. Configure the desired alert channels and set their `Enabled` values to `true`. Keep `config.json` private; it is excluded by `.gitignore`.
-5. Run the monitor from PowerShell:
+1. Clone the repository:
 
-   ```powershell
-   .\Monitor.ps1
-   ```
+```powershell
+git clone https://github.com/jarbas-abreujr/powershell-system-monitor.git
+cd powershell-system-monitor
+```
 
-The script writes its log to `Logs\CPULogs.txt` beside `Monitor.ps1`. Press `Ctrl+C` to stop it.
+2. Create the configuration folder and copy the example file:
+
+```powershell
+New-Item -ItemType Directory -Path C:\MonitorApp\settings -Force
+Copy-Item .\config.example.json C:\MonitorApp\settings\config.json
+```
+
+3. Edit `C:\MonitorApp\settings\config.json`: adjust the thresholds, then set `Enabled` to `true` and fill in the details of each channel you want to use.
+
+4. Run the script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Monitor.ps1
+```
+
+The log is written to `C:\MonitorApp\Logs\CPULogs.txt`, and the folder is created automatically. Both the log and config paths are defined at the top of the script.
 
 ## Configuration
 
-- `CheckInterval`: delay between checks, in seconds.
-- `Thresholds`: warning and critical percentages for `CPU`, `Memory`, and `Disk`.
-- `DiskPath`: drive to monitor, including its colon (for example, `C:\`).
-- `Alerts`: independent notification settings for email, Slack, Microsoft Teams, and Discord.
+| Field | Description |
+| --- | --- |
+| `CheckInterval` | Seconds between checks |
+| `Thresholds.CPU`, `Thresholds.Memory`, `Thresholds.Disk` | `Warning` and `Critical` usage percentages for each metric |
+| `DiskPath` | Drive to monitor, for example `C:\\` (backslashes are escaped in JSON) |
+| `Alerts.<Channel>.Enabled` | `true` to send alerts through that channel |
+| `Alerts.Email` | `SmtpServer`, `SmtpPort`, `From`, `To`, `Username`, `Password` |
+| `Alerts.Slack`, `Alerts.Teams`, `Alerts.Discord` | `WebhookUrl` |
 
-An alert is sent when a metric changes severity, rather than on every check. A transition back to `Normal` is also reported. The script continues monitoring if an individual metric or notification channel encounters an error.
+`config.json` contains credentials and is listed in `.gitignore`. Only `config.example.json`, which has placeholder values, belongs in the repository.
 
-Email notifications use `Send-MailKitMessage`; install and configure that module before enabling email. Webhook-based channels require a valid URL for the corresponding service.
+## Notification channels
+
+| Channel | Method | Status |
+| --- | --- | --- |
+| Email | SMTP through MailKit | Tested with Gmail using an app password |
+| Discord | Webhook with an embed message | Tested |
+| Slack | Incoming webhook | Implemented following Slack's webhook format; not tested against a live workspace |
+| Teams | Workflows webhook with an Adaptive Card | Implemented following Microsoft's documentation; not tested, as it requires a Microsoft 365 work or school account |
+
+Gmail requires 2-step verification and an app password. The regular account password does not work for SMTP.
+
+## Example output
+
+Console:
+
+```
+CPU: 12% [Normal]
+Memory: 58.4% [Normal]
+Disk: 90.08% [Critical]
+```
+
+Log:
+
+```
+[2026-08-03 19:59:10] [INFO] [Warning] Disk usage is at 80.35%.
+```
+
+Alerts received by email and on Discord:
+
+![Email alerts](images/emailalerts.png)
+
+![Discord alerts](images/discordalerts.png)
+
+Log File output
+![Log File](images/LogsFile.png)
+
+## Limitations and next steps
+
+- Windows only, since the metrics come from CIM
+- Credentials are stored in plain text in `config.json`; a secret store such as PowerShell SecretManagement would be safer
+- The script runs while its console is open; for continuous monitoring it should run as a scheduled task
+- Every enabled channel receives every alert; routing by severity (for example, Critical only by email) is not implemented
