@@ -1,0 +1,41 @@
+{
+  "CheckInterval": 5,
+  "Thresholds": {
+    "CPU": {
+      "Warning": 75,
+      "Critical": 90
+    },
+    "Memory": {
+      "Warning": 75,
+      "Critical": 90
+    },
+    "Disk": {
+      "Warning": 80,
+      "Critical": 90
+    }
+  },
+  "DiskPath": "C:\\",
+  "Alerts": {
+    "Email": {
+      "Enabled": false,
+      "SmtpServer": "smtp.example.com",
+      "SmtpPort": 587,
+      "From": "monitor@example.com",
+      "To": "recipient@example.com",
+      "Username": "monitor@example.com",
+      "Password": "replace-with-a-local-secret"
+    },
+    "Slack": {
+      "Enabled": false,
+      "WebhookUrl": "https://hooks.slack.com/services/replace-me"
+    },
+    "Teams": {
+      "Enabled": false,
+      "WebhookUrl": "https://example.webhook.office.com/replace-me"
+    },
+    "Discord": {
+      "Enabled": false,
+      "WebhookUrl": "https://discord.com/api/webhooks/replace-me"
+    }
+  }
+}

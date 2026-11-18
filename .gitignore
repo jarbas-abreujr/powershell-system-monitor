@@ -1,0 +1,17 @@
+# Local configuration may contain passwords and webhook URLs.
+/config.json
+
+# Runtime output
+/Logs/
+*.log
+
+# Local environment and editor files
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+*.user
+*.tmp
+Thumbs.db
+Desktop.ini
